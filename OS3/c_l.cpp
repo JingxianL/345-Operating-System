@@ -10,7 +10,7 @@ Input:
 - The total simulation time (in integer seconds)
 - The quantum size (in integer milliseconds; usually between 10 and 100)
 - The number of processes allowed in the system (degree of multiprogramming - how many jobs are in the system)
-2) An input text file contains incoming jobs. The first line is an integer that represents the total number of lines (jobs) in the file. Each subsequent line has four integers: start time of the job, PID, the probability of I/O requests, and the job length.
+2) An input text file contains incoming jobs. The first line is an integer that represents the total number of Lines (jobs) in the file. Each subsequent line has four integers: start time of the job, PID, the probability of I/O requests, and the job length.
 
 Output:
 1) Output on console:
@@ -47,8 +47,8 @@ int IOLength;
 const int PENALTYENTERCPU = 4;
 
 int RandomNumber(int start, int endtime);
-void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &throughput, int &jobsinsystem);
-int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &throughput, int &jobsinsystem, int systemtimeat);
+void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem);
+int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem, int CurrentSystemTime);
 int JobsStillInSystem(queue<jobs> ready, queue<jobs> IO);
 int TotalJobsSkip(queue<jobs> incoming);
 
@@ -68,55 +68,58 @@ struct jobs
 
 int main()
 {
-	ifstream file;
-	string filename;
-	int simulationtime;
-	int quantumsize;
-	int numprocesses;
-	int lines;
+	ifstream fin;
+	string FileName;
+	int SimulationTime;
+	int QuantumSize;
+	int NumProcesses;
+	int Lines;
 	srand(time(NULL));
-	cout << "Please enter the file name: ";
-	// cin >> filename;
-	filename = "input.txt";
-	file.open(filename.c_str());
+	cout << "Please enter the file name: " << endl;
+	// cin >> FileName;
+	FileName = "input.txt";
+	fin.open(FileName.c_str());
 
-	if(file.is_open())
+	if(fin.is_open())
 	{
 		//incoming incomingqueue;
 		//ready readyqueue;
 		//IO ioqueue;
-		int throughput = 0;
-		int jobsinsystem = 0;
-		int systemtimeat = 0;
-		int jobsskipped = 0;
+		int Throughput = 0;
+		int JobsInSystem = 0;
+		int CurrentSystemTime = 0;
+		int JobsSkipped = 0;
 
-		cout << "What is the desired simulation time (in seconds)? ";
-		cin >> simulationtime;
-		simulationtime = simulationtime * 1000;
+		cout << "Please enter the desired simulation time (in seconds): ";
+		cin >> SimulationTime;
+		SimulationTime = SimulationTime * 1000;
+		cout << endl;
 
-		cout << "What is the desired quantum size (in milliseconds)? ";
-		cin >> quantumsize;
+		cout << "Please enter the desired quantum size (in milliseconds): ";
+		cin >> QuantumSize;
+		cout << endl;
 
-		cout << "What is the number of processes allowed in the system? ";
-		cin >> numprocesses;
+		cout << "Please enter the number of processes allowed in the system: ";
+		cin >> NumProcesses;
+		cout << endl;
 
-		jobs nextjob;
-		file >> lines;
-		for(int i=0; i<lines; i++)
+		jobs NextJob;
+		fin >> Lines;
+		for(int i=0; i<Lines; i++)
 		{
-			file >> nextjob.StartTime 
-			>> nextjob.PID 
-			>> nextjob.ProbIORequest 
-			>> nextjob.Length;
-			incoming.push(nextjob);
+			fin >> NextJob.StartTime 
+			>> NextJob.PID 
+			>> NextJob.ProbIORequest 
+			>> NextJob.Length;
+			incoming.push(NextJob);
 
-			cout << nextjob.StartTime << "\t"
-			<< nextjob.PID << "\t"
-			<< nextjob.ProbIORequest << "\t"
-			<< nextjob.Length << "\n";
+			cout << NextJob.StartTime << "\t"
+			<< NextJob.PID << "\t"
+			<< NextJob.ProbIORequest << "\t"
+			<< NextJob.Length << "\n";
 		}
 
-		for(int j=0; j<numprocesses; j++)
+		for(int j=0; j<NumProcesses; j++)
 		{
 			ready.push(incoming.front());
 			incoming.pop();
@@ -124,7 +127,7 @@ int main()
 
 		// remember to remove below
 		// cout << "ready queue: ";
-		// for(int i=0; i<numprocesses; i++)
+		// for(int i=0; i<NumProcesses; i++)
 		// {
 		// jobs temp;
 		// temp = ready.front();
@@ -132,7 +135,7 @@ int main()
 		// ready.pop();
 		// }
 		// cout << "incoming queue: ";
-		// for(int i=0; i<(lines-numprocesses); i++)
+		// for(int i=0; i<(Lines-NumProcesses); i++)
 		// {
 		// jobs temp;
 		// temp = incoming.front();
@@ -141,31 +144,31 @@ int main()
 		// }
 		// remember to remove above
 		// cout << "before while " << endl;
-		while(systemtimeat <= simulationtime && (!ready.empty() || !IO.empty()))
+		while(CurrentSystemTime <= SimulationTime && (!ready.empty() || !IO.empty()))
 		{
 			// cout << "inwhile" << endl;
-			// cout << "before " << systemtimeat;
-			systemtimeat = cpu(quantumsize, ready, IO, throughput, jobsinsystem, systemtimeat);
-			IO_Process(quantumsize, ready, IO, throughput, jobsinsystem);
-			cout << "simulationtime\t" << simulationtime
-			<< "\nsystemtimeat\t" << systemtimeat;
-			// cout << "  after " << systemtimeat << endl;
+			// cout << "before " << CurrentSystemTime;
+			CurrentSystemTime = cpu(QuantumSize, ready, IO, Throughput, JobsInSystem, CurrentSystemTime);
+			IO_Process(QuantumSize, ready, IO, Throughput, JobsInSystem);
+			cout << "SimulationTime\t" << SimulationTime
+			<< "\ncurrentsystemtime\t" << CurrentSystemTime;
+			// cout << "  after " << CurrentSystemTime << endl;
 			cout << "Ready empty: " << ready.empty() << endl 
 			<< "IO empty: " << IO.empty() << endl;
 			cout << endl << endl;
 		}
 		cout << "afterwhile "<< endl;
-		jobsinsystem = JobsStillInSystem(ready, IO);
-		jobsskipped = TotalJobsSkip(incoming);
+		JobsInSystem = JobsStillInSystem(ready, IO);
+		JobsSkipped = TotalJobsSkip(incoming);
 
 		// Need to change the output placeholders
-		cout << "Throughput (number of jobs completed during the simulation):\t" << throughput << endl
-		<< "Number of jobs still in system:\t" << jobsinsystem << endl
-		<< "Number of jobs skipped:\t" << jobsskipped << endl
-		<< "Average job length excluding I/O time:\t" << throughput << " (ms)" << endl
-		<< "Average turnaround time:\t" << throughput << " (ms)" << endl
-		<< "Average waiting time per process:\t" << throughput << " (ms)" << endl
-		<< "CPU utilization (percentage of time CPU is busy):\t" << throughput << '%' << endl;
+		cout << "Throughput (number of jobs completed during the simulation):\t" << Throughput << endl
+		<< "Number of jobs still in system:\t" << JobsInSystem << endl
+		<< "Number of jobs skipped:\t" << JobsSkipped << endl
+		<< "Average job length excluding I/O time:\t" << Throughput << " (ms)" << endl
+		<< "Average turnaround time:\t" << Throughput << " (ms)" << endl
+		<< "Average waiting time per process:\t" << Throughput << " (ms)" << endl
+		<< "CPU utilization (percentage of time CPU is busy):\t" << Throughput << '%' << endl;
 
 	}
 	else
@@ -183,7 +186,7 @@ int RandomNumber(int start, int endtime)
 	return RandomNumber;
 }
 
-void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &throughput, int &jobsinsystem){
+void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem){
 	if(IOTimeStart != 0 ){
 		if ((IOLength < (time(NULL) - IOTimeStart))) {
 			EnterIO = false;
@@ -207,12 +210,12 @@ void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &throughpu
 	}
 }
 
-int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &throughput, int &jobsinsystem, int systemtimeat)
+int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem, int CurrentSystemTime)
 {
 	if(!ready.empty()){
 		jobs incpu;
 		incpu = ready.front();
-		systemtimeat = systemtimeat + PENALTYENTERCPU;
+		CurrentSystemTime = CurrentSystemTime + PENALTYENTERCPU;
 		ready.pop();
 
 		cout << "-------- cpu -------\n"
@@ -223,7 +226,7 @@ int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &throughput, int &
 		<< "-------- cpu -------\n";
 
 		incpu.Length = incpu.Length - quantum;
-		systemtimeat = systemtimeat + quantum;
+		CurrentSystemTime = CurrentSystemTime + quantum;
 
 		if(incpu.Length > quantum)
 		{
@@ -246,7 +249,7 @@ int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &throughput, int &
 		else if(incpu.Length <= quantum)
 		{
 			cout << "------ else if --------\n";
-			throughput++;
+			Throughput++;
 			if(!incoming.empty())
 			{
 				cout << "------ else if -> if --------\n";
@@ -256,33 +259,33 @@ int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &throughput, int &
 		}
 	}
 
-	return systemtimeat;
+	return CurrentSystemTime;
 }
 
 int JobsStillInSystem(queue<jobs> ready, queue<jobs> IO)
 {
-	int jobsinsystem = 0;
+	int JobsInSystem = 0;
 	while(!ready.empty())
 	{
-		jobsinsystem++;
+		JobsInSystem++;
 		ready.pop();
 	}
 	while(!IO.empty())
 	{
-		jobsinsystem++;
+		JobsInSystem++;
 		IO.pop();
 	}
 
-	return jobsinsystem;
+	return JobsInSystem;
 }
 
 int TotalJobsSkip(queue<jobs> incoming)
 {
-	int jobsskipped;
+	int JobsSkipped;
 	while(!incoming.empty())
 	{
-		jobsskipped++;
+		JobsSkipped++;
 		incoming.pop();
 	}
-	return jobsskipped;
+	return JobsSkipped;
 }
