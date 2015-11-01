@@ -212,7 +212,7 @@ void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughpu
 		IO.pop();
 
 		// Generate initial random value for new process and put it at the end of the ready queue
-		IOLength = RandomNumber(10,25);
+		IOLength = RandomNumber(5,25);
 		ready.push(inIO);
 	}
 }
@@ -243,12 +243,12 @@ int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &
 
 			int rrandomnumber;
 			rrandomnumber = RandomNumber(1,100);
-			if(incpu.ProbIORequest <= rrandomnumber)
+			if(incpu.ProbIORequest >= rrandomnumber)
 			{
 				// cout << "------ if -> if--------\n";
 				IO.push(incpu);
 			}
-			else if(incpu.ProbIORequest > rrandomnumber)
+			else if(incpu.ProbIORequest < rrandomnumber)
 			{
 				// cout << "------ if -> else if--------\n";
 				ready.push(incpu);
