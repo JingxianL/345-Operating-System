@@ -74,7 +74,7 @@ int main()
 {
 	ifstream fin;
 	string FileName;
-	int SimulationTime;
+	float SimulationTime;
 	int QuantumSize;
 	int NumProcesses;
 	int Lines;
@@ -86,9 +86,7 @@ int main()
 
 	if(fin.is_open())
 	{
-		//incoming incomingqueue;
-		//ready readyqueue;
-		//IO ioqueue;
+
 		int Throughput = 0;
 		int JobsInSystem = 0;
 		int CurrentSystemTime = 0;
@@ -129,44 +127,21 @@ int main()
 			incoming.pop();
 		}
 
-		// remember to remove below
-		// cout << "ready queue: ";
-		// for(int i=0; i<NumProcesses; i++)
-		// {
-		// jobs temp;
-		// temp = ready.front();
-		// cout << temp.PID << " ";
-		// ready.pop();
-		// }
-		// cout << "incoming queue: ";
-		// for(int i=0; i<(Lines-NumProcesses); i++)
-		// {
-		// jobs temp;
-		// temp = incoming.front();
-		// cout << temp.PID << " ";
-		// incoming.pop();
-		// }
-		// remember to remove above
-		// cout << "before while " << endl;
+
 		while(CurrentSystemTime <= SimulationTime && (!ready.empty() || !IO.empty()))
 		{
-			// cout << "inwhile" << endl;
-			// cout << "before " << CurrentSystemTime;
+			cout << " CurrentSystemTime is :  " << CurrentSystemTime << "\n";
 			CurrentSystemTime = CPU(QuantumSize, ready, IO, Throughput, JobsInSystem, CurrentSystemTime);
 			IO_Process(QuantumSize, ready, IO, Throughput, JobsInSystem);
-			// cout << "SimulationTime\t" << SimulationTime
-			// << "\ncurrentsystemtime\t" << CurrentSystemTime;
-			// // cout << "  after " << CurrentSystemTime << endl;
-			// cout << "Ready empty: " << ready.empty() << endl 
-			// << "IO empty: " << IO.empty() << endl;
-			// cout << endl << endl;
+
 		}
-		// cout << "afterwhile "<< endl;
+
+		cout << " Throughput is :  " << Throughput << "\n";
+
 		JobsInSystem = JobsStillInSystem(ready, IO);
-		JobsSkipped = TotalJobsSkip(incoming);
+		// JobsSkipped = TotalJobsSkip(incoming);
 
-		// Need to change the output placeholders
-
+		cout << " JobsInSystem is :  " << JobsInSystem << "\n";
 
 		//-----------------------------------------------------------------------------------------
 		// cout << "Throughput (number of jobs completed during the simulation):\t" << Throughput << endl
@@ -179,7 +154,7 @@ int main()
 
 	}
 	else
-		cout << "sorry not a valid file" << endl;
+		cout << "No such file exists!" << endl;
 
 
 	return 0;
@@ -213,7 +188,16 @@ void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughpu
 
 		// Generate initial random value for new process and put it at the end of the ready queue
 		IOLength = RandomNumber(5,25);
-		ready.push(inIO);
+
+		if(inIO.Length != 0)
+		{
+			int newIOProb;
+			newIOProb = RandomNumber(0,100);
+			inIO.ProbIORequest = newIOProb;
+			ready.push(inIO);
+		}
+
+
 	}
 }
 
@@ -226,50 +210,53 @@ int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &
 		ready.pop();
 
 
-		//---------------------------------------------------------
-		// cout << "-------- cpu -------\n"
-		// << incpu.StartTime << "\t"
-		// << incpu.PID << "\t"
-		// << incpu.ProbIORequest << "\t"
-		// << incpu.Length << "\n"
-		// << "-------- cpu -------\n";
+		// ---------------------------------------------------------
+		cout << "-------- cpu -------\n"
+		<< incpu.StartTime << "\t"
+		<< incpu.PID << "\t"
+		<< incpu.ProbIORequest << "\t"
+		<< incpu.Length << "\n"
+		<< "-------- cpu -------\n";
 
-		incpu.Length = incpu.Length - quantum;
-		CurrentSystemTime = CurrentSystemTime + quantum;
 
-		if(incpu.Length > quantum)
+		if(incpu.Length - quantum >= quantum)
 		{
-			// cout << "------ if --------\n";
-
-			int rrandomnumber;
-			rrandomnumber = RandomNumber(1,100);
-			if(incpu.ProbIORequest >= rrandomnumber)
-			{
-				// cout << "------ if -> if--------\n";
-				IO.push(incpu);
-			}
-			else if(incpu.ProbIORequest < rrandomnumber)
-			{
-				// cout << "------ if -> else if--------\n";
-				ready.push(incpu);
-			}
-
+			incpu.Length = incpu.Length - quantum;
+			CurrentSystemTime = CurrentSystemTime + quantum;
 		}
-		else if(incpu.Length <= quantum)
+		else
 		{
-			// cout << "------ else if --------\n";
 			Throughput++;
+			incpu.Length = 0;
+			CurrentSystemTime = CurrentSystemTime + incpu.Length;
 			if(!incoming.empty())
 			{
-				// cout << "------ else if -> if --------\n";
 				ready.push(incoming.front());
-				ready.pop();
+				incoming.pop();
 			}
 		}
+
+
+		int rrandomnumber;
+		rrandomnumber = RandomNumber(0,100);
+
+		cout << incpu.Length << "\t"
+		<< rrandomnumber << "\n";
+
+		if(incpu.ProbIORequest >= rrandomnumber)
+		{
+			IO.push(incpu);
+		}
+		else if(incpu.ProbIORequest < rrandomnumber)
+		{
+			ready.push(incpu);
+		}
+
 	}
 
 	return CurrentSystemTime;
 }
+
 
 int JobsStillInSystem(queue<jobs> ready, queue<jobs> IO)
 {
@@ -288,6 +275,8 @@ int JobsStillInSystem(queue<jobs> ready, queue<jobs> IO)
 	return JobsInSystem;
 }
 
+
+/*
 int TotalJobsSkip(queue<jobs> incoming)
 {
 	int JobsSkipped;
@@ -298,3 +287,4 @@ int TotalJobsSkip(queue<jobs> incoming)
 	}
 	return JobsSkipped;
 }
+*/
