@@ -170,10 +170,13 @@ int RandomNumber(int start, int endtime)
 
 void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem){
 	if(IOTimeStart != 0 ){
-		if ((IOLength < (time(NULL) - IOTimeStart))) {
+		cout << "enter IOTimeStart " << endl;
+		if ((IOLength > (time(NULL) - IOTimeStart))) {
 			EnterIO = false;
+			cout << "false" << endl;
 		} else {
 			EnterIO = true;
+			cout << "true" << endl;
 		}
 	}
 
@@ -188,14 +191,13 @@ void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughpu
 
 		// Generate initial random value for new process and put it at the end of the ready queue
 		IOLength = RandomNumber(5,25);
+		cout << "IO IOLength is :" << IOLength << endl;
 
-		if(inIO.Length != 0)
-		{
-			int newIOProb;
-			newIOProb = RandomNumber(0,100);
-			inIO.ProbIORequest = newIOProb;
-			ready.push(inIO);
-		}
+		//after io complete, then push into ready
+
+		inIO.ProbIORequest = RandomNumber(1,100);
+		ready.push(inIO);
+	
 
 
 	}
@@ -225,26 +227,31 @@ int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &
 			incpu.Length = incpu.Length - quantum;
 			CurrentSystemTime = CurrentSystemTime + quantum;
 
-			newIOProb = RandomNumber(0,100);
+			newIOProb = RandomNumber(1,100);
 
 			cout << incpu.Length << "\t"
 			<< newIOProb << "\n";
 
 			if(incpu.ProbIORequest >= newIOProb)
 			{
+				cout << "IO PUSH" << endl;
 				IO.push(incpu);
 			}
 			else if(incpu.ProbIORequest < newIOProb)
 			{
+				cout << "not" << endl;
 				ready.push(incpu);
 			}
+
 
 		}
 		else
 		{
+			// cout << "before:  " << CurrentSystemTime << endl;
 			Throughput++;
-			incpu.Length = 0;
 			CurrentSystemTime = CurrentSystemTime + incpu.Length;
+			incpu.Length = 0;
+			// cout << "after:  " << CurrentSystemTime << endl;
 			if(!incoming.empty())
 			{
 				ready.push(incoming.front());
