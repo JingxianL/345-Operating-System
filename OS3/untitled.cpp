@@ -223,6 +223,22 @@ int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &
 		{
 			incpu.Length = incpu.Length - quantum;
 			CurrentSystemTime = CurrentSystemTime + quantum;
+
+			int rrandomnumber;
+			rrandomnumber = RandomNumber(0,100);
+
+			cout << incpu.Length << "\t"
+			<< rrandomnumber << "\n";
+
+			if(incpu.ProbIORequest >= rrandomnumber)
+			{
+				IO.push(incpu);
+			}
+			else if(incpu.ProbIORequest < rrandomnumber)
+			{
+				ready.push(incpu);
+			}
+
 		}
 		else
 		{
@@ -237,20 +253,6 @@ int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &
 		}
 
 
-		int rrandomnumber;
-		rrandomnumber = RandomNumber(0,100);
-
-		cout << incpu.Length << "\t"
-		<< rrandomnumber << "\n";
-
-		if(incpu.ProbIORequest >= rrandomnumber)
-		{
-			IO.push(incpu);
-		}
-		else if(incpu.ProbIORequest < rrandomnumber)
-		{
-			ready.push(incpu);
-		}
 
 	}
 
