@@ -203,6 +203,7 @@ void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughpu
 
 int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem, int CurrentSystemTime)
 {
+	int newIOProb;
 	if(!ready.empty()){
 		jobs incpu;
 		incpu = ready.front();
@@ -224,17 +225,16 @@ int CPU(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &
 			incpu.Length = incpu.Length - quantum;
 			CurrentSystemTime = CurrentSystemTime + quantum;
 
-			int rrandomnumber;
-			rrandomnumber = RandomNumber(0,100);
+			newIOProb = RandomNumber(0,100);
 
 			cout << incpu.Length << "\t"
-			<< rrandomnumber << "\n";
+			<< newIOProb << "\n";
 
-			if(incpu.ProbIORequest >= rrandomnumber)
+			if(incpu.ProbIORequest >= newIOProb)
 			{
 				IO.push(incpu);
 			}
-			else if(incpu.ProbIORequest < rrandomnumber)
+			else if(incpu.ProbIORequest < newIOProb)
 			{
 				ready.push(incpu);
 			}
