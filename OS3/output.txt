@@ -1,0 +1,276 @@
+12	4	3	450
+15	5	40	200
+20	6	72	230
+23	9	5	350
+24	2	14	460
+27	7	26	240
+37	1	36	150
+45	8	86	250
+50	3	43	100
+ CurrentSystemTime is :  0
+-------- cpu -------
+12	4	3	450
+-------- cpu -------
+400	61
+not
+ CurrentSystemTime is :  54
+-------- cpu -------
+15	5	40	200
+-------- cpu -------
+150	28
+IO PUSH
+IO IOLength2 is :0.019
+ CurrentSystemTime is :  108
+-------- cpu -------
+20	6	72	230
+-------- cpu -------
+180	82
+not
+ CurrentSystemTime is :  162
+-------- cpu -------
+23	9	5	350
+-------- cpu -------
+300	1
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.022
+ CurrentSystemTime is :  216
+-------- cpu -------
+12	4	3	400
+-------- cpu -------
+350	1
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.008
+ CurrentSystemTime is :  270
+-------- cpu -------
+15	5	4	150
+-------- cpu -------
+100	56
+not
+ CurrentSystemTime is :  324
+-------- cpu -------
+20	6	72	180
+-------- cpu -------
+130	50
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.01
+ CurrentSystemTime is :  378
+-------- cpu -------
+23	9	7	300
+-------- cpu -------
+250	95
+not
+ CurrentSystemTime is :  432
+-------- cpu -------
+12	4	18	350
+-------- cpu -------
+300	13
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.02
+ CurrentSystemTime is :  486
+-------- cpu -------
+15	5	4	100
+-------- cpu -------
+50	72
+not
+ CurrentSystemTime is :  540
+-------- cpu -------
+20	6	19	130
+-------- cpu -------
+80	93
+not
+ CurrentSystemTime is :  594
+-------- cpu -------
+23	9	7	250
+-------- cpu -------
+200	29
+not
+ CurrentSystemTime is :  648
+-------- cpu -------
+12	4	79	300
+-------- cpu -------
+250	31
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.013
+ CurrentSystemTime is :  702
+-------- cpu -------
+15	5	4	50
+-------- cpu -------
+ CurrentSystemTime is :  756
+-------- cpu -------
+20	6	19	80
+-------- cpu -------
+30	32
+not
+ CurrentSystemTime is :  810
+-------- cpu -------
+23	9	7	200
+-------- cpu -------
+150	17
+not
+ CurrentSystemTime is :  864
+-------- cpu -------
+12	4	97	250
+-------- cpu -------
+200	72
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.007
+ CurrentSystemTime is :  918
+-------- cpu -------
+24	2	14	460
+-------- cpu -------
+410	91
+not
+ CurrentSystemTime is :  972
+-------- cpu -------
+20	6	19	30
+-------- cpu -------
+ CurrentSystemTime is :  1006
+-------- cpu -------
+23	9	7	150
+-------- cpu -------
+100	91
+not
+ CurrentSystemTime is :  1060
+-------- cpu -------
+12	4	2	200
+-------- cpu -------
+150	29
+not
+ CurrentSystemTime is :  1114
+-------- cpu -------
+24	2	14	410
+-------- cpu -------
+360	7
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.023
+ CurrentSystemTime is :  1168
+-------- cpu -------
+27	7	26	240
+-------- cpu -------
+190	59
+not
+ CurrentSystemTime is :  1222
+-------- cpu -------
+23	9	7	100
+-------- cpu -------
+50	64
+not
+ CurrentSystemTime is :  1276
+-------- cpu -------
+12	4	2	150
+-------- cpu -------
+100	21
+not
+ CurrentSystemTime is :  1330
+-------- cpu -------
+24	2	63	360
+-------- cpu -------
+310	59
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.023
+ CurrentSystemTime is :  1384
+-------- cpu -------
+27	7	26	190
+-------- cpu -------
+140	66
+not
+ CurrentSystemTime is :  1438
+-------- cpu -------
+23	9	7	50
+-------- cpu -------
+ CurrentSystemTime is :  1492
+-------- cpu -------
+12	4	2	100
+-------- cpu -------
+50	18
+not
+ CurrentSystemTime is :  1546
+-------- cpu -------
+24	2	38	310
+-------- cpu -------
+260	21
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.015
+ CurrentSystemTime is :  1600
+-------- cpu -------
+27	7	26	140
+-------- cpu -------
+90	33
+not
+ CurrentSystemTime is :  1654
+-------- cpu -------
+37	1	36	150
+-------- cpu -------
+100	52
+not
+ CurrentSystemTime is :  1708
+-------- cpu -------
+12	4	2	50
+-------- cpu -------
+ CurrentSystemTime is :  1762
+-------- cpu -------
+24	2	65	260
+-------- cpu -------
+210	95
+not
+ CurrentSystemTime is :  1816
+-------- cpu -------
+27	7	26	90
+-------- cpu -------
+40	57
+not
+ CurrentSystemTime is :  1870
+-------- cpu -------
+37	1	36	100
+-------- cpu -------
+50	96
+not
+ CurrentSystemTime is :  1924
+-------- cpu -------
+45	8	86	250
+-------- cpu -------
+200	24
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.016
+ CurrentSystemTime is :  1978
+-------- cpu -------
+24	2	65	210
+-------- cpu -------
+160	20
+IO PUSH
+enter IOTimeStart 
+true
+IO IOLength2 is :0.022
+ CurrentSystemTime is :  2032
+-------- cpu -------
+27	7	26	40
+-------- cpu -------
+ CurrentSystemTime is :  2076
+-------- cpu -------
+37	1	36	50
+-------- cpu -------
+Throughput (number of jobs completed during the simulation):	6
+Number of jobs still in system:	3
+Average job length excluding I/O time:	270 (ms)
+Average turnaround time:	424.889 (ms)
+Average waiting time per process:	12 (ms)
