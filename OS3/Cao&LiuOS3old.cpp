@@ -36,7 +36,7 @@ Output:
 
 using namespace std;
 
-//global int penalyzation for entering the cpu = 4;
+//global int penalyzation for entering the cpu =4;
 
 const int PENALTYENTERCPU = 4;
 
@@ -50,17 +50,15 @@ public:
 	int Length;
 	float IOLength;
 	int TurnaroundTime;
-	int WorkStartTime;
-	int WorkEndTime;
-	int WorkTime;
-	bool FirstTime;
+	// int WorkTime;
+	// int TotalTime;
 
 };
 
 // Declaration for functions 
 int RandomNumber(int start, int endtime); // calculating random integers in range start to end
 // CPU function that process jobs in the CPU
-int CPU(int quantum, queue<jobs> &incoming, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem, int CurrentSystemTime, float &TotalLength, float &TotalTurnaroundTime, float &TotalWaitTime, int &JobsSkipped, float &CpuWorkTime);
+int CPU(int quantum, queue<jobs> &incoming, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem, int CurrentSystemTime, float &TotalLength, float &TotalTurnaroundTime);
 // IO function that process jobs in IO
 void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem, float &TotalTurnaroundTime, bool &EnterIO, time_t &IOTimeStart);
 // Calculate the number of jobs still in the system
@@ -87,10 +85,8 @@ int main()
 	float AveJobLength;
 	float TotalTurnaroundTime = 0;
 	float AveTurnaroundTime;
-	float TotalWaitTime = 0;
-	float AveWaitTime;
-	float CpuWorkTime = 0;
-	float Utilization;
+	// float TotalWaitTime = 0;
+	// float AveWaitTime;
 
 	srand(time(NULL));
 	cout << "Please enter the file name: " << endl;
@@ -127,10 +123,8 @@ int main()
 			>> NextJob.ProbIORequest 
 			>> NextJob.Length;
 			NextJob.TurnaroundTime = 0;
-			NextJob.WorkStartTime = 0;
-			NextJob.WorkEndTime = 0;
-			NextJob.WorkTime = 0;
-			NextJob.FirstTime = true;
+			// NextJob.WorkTime = 0;
+			// NextJob.TotalTime = 0;
 			incoming.push(NextJob);
 		}
 
@@ -138,36 +132,32 @@ int main()
 		for(int j=0; j<NumProcesses; j++)
 		{
 			ready.push(incoming.front());
+			// incoming.front().TotalTime = time(NULL);
 			TotalLength = TotalLength + incoming.front().Length;
 			incoming.pop();
 		}
-		CurrentSystemTime = CurrentSystemTime + ready.front().StartTime;
-		ready.front().FirstTime = false;
 		// call the CPU and IO function to process each job in the queue
 		while(CurrentSystemTime <= SimulationTime && (!ready.empty() || !IO.empty()))
 		{
-			CurrentSystemTime = CPU(QuantumSize, incoming, ready, IO, Throughput, JobsInSystem, CurrentSystemTime, TotalLength, TotalTurnaroundTime, TotalWaitTime, JobsSkipped, CpuWorkTime);
+			CurrentSystemTime = CPU(QuantumSize, incoming, ready, IO, Throughput, JobsInSystem, CurrentSystemTime, TotalLength, TotalTurnaroundTime);
 			IO_Process(QuantumSize, ready, IO, Throughput, JobsInSystem, TotalTurnaroundTime, EnterIO, IOTimeStart);
 		}
 
-		// call the job in system function to get how many jobs in the system
+		//call the job in system function to get how many jobs in the system
 		JobsInSystem = JobsStillInSystem(ready, IO);
 		// calculate the ave job length 
 		AveJobLength = TotalLength/float(Throughput + JobsInSystem);
-		// calculate the ave turn around time
+		//calculate the ave turn around time
 		AveTurnaroundTime = TotalTurnaroundTime/float(Throughput + JobsInSystem);
-		// calculate the ave wait time
-		AveWaitTime = TotalWaitTime/float(Throughput + JobsInSystem);
-		// calculate the CPU utilization
-		Utilization = CpuWorkTime/SimulationTime;
-		// print output to screen
+		// AveWaitTime = TotalWaitTime/float(Throughput + JobsInSystem);
+		//print output to screen
 		cout << "Throughput (number of jobs completed during the simulation):\t" << Throughput << "\n"
 		<< "Number of jobs still in system:\t" << JobsInSystem << "\n"
 		<< "Number of jobs skipped:\t" << JobsSkipped << "\n"
 		<< "Average job length excluding I/O time:\t" << AveJobLength << " (ms)" << "\n"
-		<< "Average turnaround time:\t" << AveTurnaroundTime << " (ms)" << "\n"
-		<< "Average waiting time per process:\t" << AveWaitTime << " (ms)" << "\n"
-		<< "CPU utilization (percentage of time CPU is busy):\t" << Utilization << '%' << "\n";
+		<< "Average turnaround time:\t" << AveTurnaroundTime << " (ms)" << "\n";
+		// << "Average waiting time per process:\t" << AveWaitTime << " (ms)" << "\n";
+		// << "CPU utilization (percentage of time CPU is busy):\t" << Utilization << '%' << "\n";
 	}
 	else
 		cout << "No such file exists!" << endl;
@@ -182,111 +172,55 @@ int RandomNumber(int start, int endtime)
 	return RandomNumber;
 }
 
-int CPU(int quantum, queue<jobs> &incoming, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem, int CurrentSystemTime, float &TotalLength, float &TotalTurnaroundTime, float &TotalWaitTime, int &JobsSkipped, float &CpuWorkTime)
+int CPU(int quantum, queue<jobs> &incoming, queue<jobs> &ready, queue<jobs> &IO, int &Throughput, int &JobsInSystem, int CurrentSystemTime, float &TotalLength, float &TotalTurnaroundTime)
 {
 	int newIOProb;
 	if(!ready.empty())
 	{
 		jobs incpu;
 		incpu = ready.front();
-		if(incpu.FirstTime)
-		{	
-			incpu.FirstTime = false;
-			if(incpu.StartTime >= CurrentSystemTime)
+		CurrentSystemTime = CurrentSystemTime + PENALTYENTERCPU;
+		ready.pop();
+
+		if(incpu.Length > quantum)
+		{
+			incpu.Length = incpu.Length - quantum;
+			CurrentSystemTime = CurrentSystemTime + quantum;
+			incpu.TurnaroundTime = incpu.TurnaroundTime + quantum;
+			// incpu.WorkTime = incpu.WorkTime + quantum;
+			// TotalWorkTime = TotalWorkTime + quantum;
+			newIOProb = RandomNumber(1,100);
+			// incpu.TotalTime += quantum;
+			// incpu.TotalTime += PENALTYENTERCPU;
+
+			if(incpu.ProbIORequest >= newIOProb)
 			{
-				CurrentSystemTime += incpu.StartTime - CurrentSystemTime + PENALTYENTERCPU;
-				ready.pop();
-				if(incpu.Length > quantum)
-				{
-					CpuWorkTime += quantum;
-					incpu.Length = incpu.Length - quantum;
-					incpu.WorkTime = incpu.WorkTime + quantum;
-					CurrentSystemTime = CurrentSystemTime + quantum;
-					incpu.TurnaroundTime = incpu.TurnaroundTime + quantum;
-					newIOProb = RandomNumber(1,100);
-
-					if(incpu.ProbIORequest >= newIOProb)
-					{
-						IO.push(incpu);
-					}
-					else if(incpu.ProbIORequest < newIOProb)
-					{
-						ready.push(incpu);
-					}
-				}
-				else
-				{
-					Throughput++;
-					CpuWorkTime += incpu.Length;
-					CurrentSystemTime = CurrentSystemTime + incpu.Length;
-					incpu.WorkTime = incpu.WorkTime + incpu.Length;
-					incpu.TurnaroundTime = incpu.TurnaroundTime + incpu.Length;
-					TotalTurnaroundTime = TotalTurnaroundTime + incpu.TurnaroundTime;
-					incpu.Length = 0;
-					incpu.WorkEndTime = CurrentSystemTime;
-					TotalWaitTime = TotalWaitTime + incpu.WorkEndTime - incpu.WorkStartTime - incpu.WorkTime;
-
-					if(!incoming.empty())
-					{
-						ready.push(incoming.front());
-						incoming.front().WorkStartTime = CurrentSystemTime;
-						TotalLength = TotalLength + incoming.front().Length;
-						incoming.pop();
-					}
-				}
+				IO.push(incpu);
 			}
-			else
+			else if(incpu.ProbIORequest < newIOProb)
 			{
-				JobsSkipped = JobsSkipped + 1;
-				ready.pop();
 				ready.push(incpu);
 			}
 		}
 		else
 		{
-			CurrentSystemTime = CurrentSystemTime + PENALTYENTERCPU;
-			ready.pop();
+			Throughput++;
+			CurrentSystemTime = CurrentSystemTime + incpu.Length;
+			incpu.TurnaroundTime = incpu.TurnaroundTime + incpu.Length;
+			// incpu.WorkTime = incpu.WorkTime + incpu.Length;
+			// incpu.TotalTime += incpu.Length;
+			TotalTurnaroundTime = TotalTurnaroundTime + incpu.TurnaroundTime;
+			incpu.Length = 0;
+			// TotalWaitTime = TotalWaitTime +incpu.TotalTime - incpu.WorkTime; 
 
-			if(incpu.Length > quantum)
+			if(!incoming.empty())
 			{
-				CpuWorkTime += quantum;
-				incpu.Length = incpu.Length - quantum;
-				incpu.WorkTime = incpu.WorkTime + quantum;
-				CurrentSystemTime = CurrentSystemTime + quantum;
-				incpu.TurnaroundTime = incpu.TurnaroundTime + quantum;
-				newIOProb = RandomNumber(1,100);
-
-				if(incpu.ProbIORequest >= newIOProb)
-				{
-					IO.push(incpu);
-				}
-				else if(incpu.ProbIORequest < newIOProb)
-				{
-					ready.push(incpu);
-				}
-			}
-			else
-			{
-				Throughput++;
-				CpuWorkTime += incpu.Length;
-				CurrentSystemTime = CurrentSystemTime + incpu.Length;
-				incpu.WorkTime = incpu.WorkTime + incpu.Length;
-				incpu.TurnaroundTime = incpu.TurnaroundTime + incpu.Length;
-				TotalTurnaroundTime = TotalTurnaroundTime + incpu.TurnaroundTime;
-				incpu.Length = 0;
-				incpu.WorkEndTime = CurrentSystemTime;
-				TotalWaitTime = TotalWaitTime + incpu.WorkEndTime - incpu.WorkStartTime - incpu.WorkTime;
-
-				if(!incoming.empty())
-				{
-					ready.push(incoming.front());
-					incoming.front().WorkStartTime = CurrentSystemTime;
-					TotalLength = TotalLength + incoming.front().Length;
-					incoming.pop();
-				}
+				ready.push(incoming.front());
+				// incoming.front().TotalTime = time(NULL);
+				TotalLength = TotalLength + incoming.front().Length;
+				incoming.pop();
 			}
 		}
-
 	}
 	return CurrentSystemTime;
 }
@@ -317,7 +251,9 @@ void IO_Process(int quantum, queue<jobs> &ready, queue<jobs> &IO, int &Throughpu
 
 			// Generate initial random value for new process and put it at the end of the ready queue
 			inIO.IOLength = RandomNumber(5,25);
+			// inIO.TotalTime += inIO.IOLength;
 			inIO.TurnaroundTime = inIO.TurnaroundTime + inIO.IOLength;
+			// inIO.WorkTime = inIO.WorkTime + inIO.IOLength;
 			TotalTurnaroundTime = TotalTurnaroundTime + inIO.TurnaroundTime;
 			inIO.IOLength = inIO.IOLength/1000;
 			time_t CurrentTime = IOTimeStart;
